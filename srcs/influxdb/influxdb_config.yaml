@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: influxdb-config
+  labels:
+    app: influxdb
+data:
+  influxdb.conf: |
+    bind-address = "127.0.0.1:8088"
+    [meta]
+      dir = "/var/lib/influxdb/meta"
+
+    [data]
+      dir = "/var/lib/influxdb/data"
+      wal-dir = "/var/lib/influxdb/wal"
+
+    [http]
+      enabled = true
+      auth-enabled = false
+      bind-address = ":8086"
+
+    [[graphite]]
+      enabled = false
+      database = "telegraf"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: influxdb-secret
+  labels:
+    app: influxdb
+type: Opaque
+stringData:
+  INFLUXDB_CONFIG_PATH: /etc/influxdb/influxdb.conf
+  INFLUXDB_ADMIN_USER: admin
+  INFLUXDB_ADMIN_PASSWORD: admin
+  INFLUXDB_DB: telegraf
+  INFLUXDB_USER: user
+  INFLUXDB_USER_PASSWORD: pass

@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ftps-service
+  labels:
+    app: ftps
+spec:
+  selector:
+    app: ftps
+  type: LoadBalancer
+  ports:
+    - port: 20
+      targetPort: 20
+      name: data
+      protocol: TCP
+    - port: 21
+      name: command
+      targetPort: 21
+      protocol: TCP
+    - port: 21100
+      name: passive-port0
+      targetPort: 21100
+      protocol: TCP
+    - port: 21101
+      name: passive-port1
+      targetPort: 21101
+      protocol: TCP
+    - port: 21102
+      name: passive-port2
+      targetPort: 21102
+      protocol: TCP
+    - port: 21103
+      name: passive-port3
+      targetPort: 21103
+      protocol: TCP
+    - port: 21104
+      name: passive-port4
+      targetPort: 21104
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ftps-deployment
+  labels:
+    app: ftps
+spec:
+  selector:
+    matchLabels:
+      app: ftps
+  template:
+    metadata:
+      name: ftps-pod
+      labels:
+        app: ftps
+    spec:
+      containers:
+      - name: ftps-container
+        image: ftps-image
+        imagePullPolicy: Never
+        ports:
+          - containerPort: 20
+            hostPort: 20
+          - containerPort: 21
+            hostPort: 21
+          - containerPort: 21100
+            hostPort: 21100
+          - containerPort: 21101
+            hostPort: 21101
+          - containerPort: 21102
+            hostPort: 21102
+          - containerPort: 21103
+            hostPort: 21103
+          - containerPort: 21104
+            hostPort: 21104
+        livenessProbe:
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          timeoutSeconds: 5
+          tcpSocket:
+            port: 21
