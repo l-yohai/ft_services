@@ -41,21 +41,21 @@ kubectl exec deploy/influxdb-deployment -- pkill influxd
 # build nginx image
 docker run -it -p 80:80 -p 443:443 alpine
 # update and import modules
-/ \# apk update && apk add nginx openssh openssl
+/ # apk update && apk add nginx openssh openssl
 # create certification and key
-/ \# mkdir -p /etc/nginx/ssl
-/ \# openssl req -newkey rsa:4096 -x509 -days 365 -nodes \
+/ # mkdir -p /etc/nginx/ssl
+/ # openssl req -newkey rsa:4096 -x509 -days 365 -nodes \
 			-out /etc/nginx/ssl/nginx.crt \
 			-keyout /etc/nginx/ssl/nginx.key \
 			-subj "/C=KR/ST=SEOUL/L=SEOUL/O=42SEOUL/OU=yohlee/CN=NGINX"
 # generate ssh key and run
-/ \# ssh-keygen -A
-/ \# adduser --disabled-password admin
-/ \# echo "admin:admin" | chpasswd
-/ \# /usr/sbin/sshd
+/ # ssh-keygen -A
+/ # adduser --disabled-password admin
+/ # echo "admin:admin" | chpasswd
+/ # /usr/sbin/sshd
 # make directory for running nginx and run server
-/ \# mkdir -p /var/run/nginx
-/ \# nginx -g "daemon off;"
+/ # mkdir -p /var/run/nginx
+/ # nginx -g "daemon off;"
 ```
 ---
 ### nginx
@@ -87,16 +87,20 @@ https://github.com/lhauspie/docker-vsftpd-alpine
 cd /srcs/ftps
 docker build -t ftps-image .
 kubectl apply -f vsftpd.yaml
+
 # file upload
 curl ftp://EXTERNAL-IP:21 --ssl -k -u admin:admin -T filename
 본인의 경우: curl ftp://192.168.99.96:21 --ssl -k -u admin:admin -T filename
+
 # file download
 curl ftp://EXTERNAL-IP:21/filename --ssl -k -u admin:admin -o ./filename
 본인의 경우: curl ftp://192.168.99.96:21/filename --ssl -k -u admin:admin -o ./filename
+
 # check
 kubectl get pods
 kubectl exec -it ftps-pods-name -- sh 
-/ \# cd home/vsftpd/user/
+/ # cd home/vsftpd/user/
+
 # kill vsftpd server
 kubectl exec deploy/ftps-deployment -- pkill vsftpd
 -> `(6) Could not resolve host: EXTERNAL-IP`
@@ -108,9 +112,10 @@ kubectl exec deploy/ftps-deployment -- pkill vsftpd
 cd /srcs/mysql
 docker build -t mysql-image .
 kubectl apply -f mysql.yaml
+
 # check generated wordpress table
 kubectl exec -it mysql-pods-name -- sh 
-/ \# cd var/lib/mysql/wordpress
+/ # cd var/lib/mysql/wordpress
 ```
 ---
 ### phpmyadmin
@@ -119,6 +124,7 @@ kubectl exec -it mysql-pods-name -- sh
 cd /srcs/phpmyadmin
 docker build -t phpmyadmin-image .
 kubectl apply -f phpmyadmin.yaml
+
 # check login success
 minikube dashboard
 
@@ -217,8 +223,8 @@ My Root User
 * preparation
 ```Shell
 docker run -it alpine
-/ \# apk add influxdb
-/ \# vi /etc/influxdb.conf
+/ # apk add influxdb
+/ # vi /etc/influxdb.conf
 copy and paste
 ```
 
@@ -237,8 +243,8 @@ kubectl apply -f influxdb.yaml
 * preparation
 ```Shell
 docker run -it alpine
-/ \# apk add telegraf --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing/
-/ \# vi /etc/telegraf.conf
+/ # apk add telegraf --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing/
+/ # vi /etc/telegraf.conf
 copy and paste
 ```
 
@@ -255,8 +261,8 @@ kubectl apply -f telegraf.yaml
 * preparation
 ```Shell
 docker run -it -p 30000:3000 alpine /bin/sh
-/ \# apk add grafana --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ --no-cache
-/ \# /usr/sbin/grafana-server --homepath=/usr/share/grafana
+/ # apk add grafana --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ --no-cache
+/ # /usr/sbin/grafana-server --homepath=/usr/share/grafana
 
 if you\'re using kubernetes, check `minikube docker-env` command and move CONTAINER_IP:30000
 
