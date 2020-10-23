@@ -5,17 +5,17 @@
 - virtualbox를 이용하여 minikube start
 - minikube 노드 안에서 도커 이미지를 사용하기 위하여 docker-env 명령어를 이용한다.
 ```shell
-# init docker
+** init docker **
 ./42toolbox/init_docker.sh
 
-# start minikube
+** start minikube **
 mv .minikube goinfre/minikube
 ln -s goinfre/minikube .minikube
 minikube delete
 minikube start --driver=virtualbox
 eval $(minikube -p minikube docker-env)
 
-# start ft_services
+*** start ft_services **
 ./srcs/setup.sh
 ```
 ---
@@ -40,43 +40,46 @@ kubectl exec deploy/influxdb-deployment -- pkill influxd
 ---
 ### nginx with docker
 ```shell
-# build nginx image
+** build nginx image **
 docker run -it -p 80:80 -p 443:443 alpine
 
-# update and import modules
+** update and import modules **
 / # apk update && apk add nginx openssh openssl
 
-# create certification and key
+** create certification and key **
 / # mkdir -p /etc/nginx/ssl
 / # openssl req -newkey rsa:4096 -x509 -days 365 -nodes \
 			-out /etc/nginx/ssl/nginx.crt \
 			-keyout /etc/nginx/ssl/nginx.key \
 			-subj "/C=KR/ST=SEOUL/L=SEOUL/O=42SEOUL/OU=yohlee/CN=NGINX"
 			
-# generate ssh key and run
+** generate ssh key and run **
 / # ssh-keygen -A
 / # adduser --disabled-password admin
 / # echo "admin:admin" | chpasswd
 / # /usr/sbin/sshd
 
-# make directory for running nginx and run server
+** make directory for running nginx and run server **
 / # mkdir -p /var/run/nginx
 / # nginx -g "daemon off;"
 ```
 ---
 ### nginx
 ```Shell
-# build ftps image and run
+** build ftps image and run **
 cd /srcs/nginx
 docker build -t nginx-image .
 kubectl apply -f nginx.yaml
 ```
+
 - ssh에 접속하기
 ```Shell
 ssh USER@NGINX-EXTERNAL-IP -p PORT
 본인의 경우: ssh admin@192.168.99.95 -p 22
+```
 
 - ssh서버 다운시키기
+```
 kubectl exec deploy/nginx-deployment -- pkill sshd
 이후 ssh admin@192.168.99.95 -p 22 로 접속을 시도해보면 `connection refused`가 나타난다.
 이 경우를 방지하기 위해 livenessprobe를 사용함. 잠시 기다렸다가 다시 접속해보자.
@@ -89,49 +92,49 @@ kubectl exec deploy/nginx-deployment -- pkill sshd
 https://github.com/lhauspie/docker-vsftpd-alpine
 
 ```Shell
-# build ftps image and run
+** build ftps image and run **
 cd /srcs/ftps
 docker build -t ftps-image .
 kubectl apply -f vsftpd.yaml
 
-# file upload
+** file upload **
 curl ftp://EXTERNAL-IP:21 --ssl -k -u admin:admin -T filename
 본인의 경우: curl ftp://192.168.99.96:21 --ssl -k -u admin:admin -T filename
 
-# file download
+** file download **
 curl ftp://EXTERNAL-IP:21/filename --ssl -k -u admin:admin -o ./filename
 본인의 경우: curl ftp://192.168.99.96:21/filename --ssl -k -u admin:admin -o ./filename
 
-# check
+** check **
 kubectl get pods
 kubectl exec -it ftps-pods-name -- sh 
 / # cd home/vsftpd/user/
 
-# kill vsftpd server
+** kill vsftpd server **
 kubectl exec deploy/ftps-deployment -- pkill vsftpd
 -> `(6) Could not resolve host: EXTERNAL-IP`
 ```
 ---
 ### mysql
 ```Shell
-# build mysql image and run
+** build mysql image and run **
 cd /srcs/mysql
 docker build -t mysql-image .
 kubectl apply -f mysql.yaml
 
-# check generated wordpress table
+** check generated wordpress table **
 kubectl exec -it mysql-pods-name -- sh 
 / # cd var/lib/mysql/wordpress
 ```
 ---
 ### phpmyadmin
 ```Shell
-# build phpmyadmin image and run
+** build phpmyadmin image and run **
 cd /srcs/phpmyadmin
 docker build -t phpmyadmin-image .
 kubectl apply -f phpmyadmin.yaml
 
-# check login success
+** check login success **
 minikube dashboard
 
 move `EXTERNALIP:phpmyadmin-PORT/`
@@ -140,7 +143,7 @@ and check `wordpress table`
 ---
 ### wordpress
 ```Shell
-# build wordpress image and run
+** build wordpress image and run **
 cd /srcs/wordpress
 ```
 
@@ -231,11 +234,12 @@ My Root User
 docker run -it alpine
 / # apk add influxdb
 / # vi /etc/influxdb.conf
+
 copy and paste
 ```
 
 ```Shell
-# build influxdb image and run
+** build influxdb image and run **
 cd /srcs/influxdb
 docker build -t influxdb-image .
 kubectl apply -f influxdb.yaml
@@ -251,11 +255,12 @@ kubectl apply -f influxdb.yaml
 docker run -it alpine
 / # apk add telegraf --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing/
 / # vi /etc/telegraf.conf
+
 copy and paste
 ```
 
 ```Shell
-# build telegraf image and run
+** build telegraf image and run **
 cd /srcs/telegraf
 docker build -t telegraf-image .
 kubectl apply -f telegraf.yaml
