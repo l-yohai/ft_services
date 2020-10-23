@@ -42,19 +42,23 @@ kubectl exec deploy/influxdb-deployment -- pkill influxd
 ```shell
 # build nginx image
 docker run -it -p 80:80 -p 443:443 alpine
+
 # update and import modules
 / # apk update && apk add nginx openssh openssl
+
 # create certification and key
 / # mkdir -p /etc/nginx/ssl
 / # openssl req -newkey rsa:4096 -x509 -days 365 -nodes \
 			-out /etc/nginx/ssl/nginx.crt \
 			-keyout /etc/nginx/ssl/nginx.key \
 			-subj "/C=KR/ST=SEOUL/L=SEOUL/O=42SEOUL/OU=yohlee/CN=NGINX"
+			
 # generate ssh key and run
 / # ssh-keygen -A
 / # adduser --disabled-password admin
 / # echo "admin:admin" | chpasswd
 / # /usr/sbin/sshd
+
 # make directory for running nginx and run server
 / # mkdir -p /var/run/nginx
 / # nginx -g "daemon off;"
