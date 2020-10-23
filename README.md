@@ -7,12 +7,14 @@
 ```shell
 # init docker
 ./42toolbox/init_docker.sh
+
 # start minikube
 mv .minikube goinfre/minikube
 ln -s goinfre/minikube .minikube
 minikube delete
 minikube start --driver=virtualbox
 eval $(minikube -p minikube docker-env)
+
 # start ft_services
 ./srcs/setup.sh
 ```
